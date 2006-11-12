@@ -1,0 +1,70 @@
+NAME
+    CGI::Application::Plugin::ProtectCSRF - Plug-in protected from CSRF
+
+VERSION
+    0.01
+
+SYSNPSIS
+      use Your::App;
+      use CGI::Application::Plugin::Session; # require!!
+      use CGI::Application::Plugin::ProtectCSRF;
+
+DESCRIPTION
+    CGI::Application::Plugin::ProtectCSRF is C::A::P protected from CSRF.
+
+    When CSRF is detected, 403 Forbidden is returned and processing is
+    interrupted.
+
+METHOD
+  clear_csrfid
+    Clear csrfid. It is preferable to make it execute after processing ends.
+
+    Input screen => confirmation screen => completion screen(here!!)
+
+    Example :
+
+      sub input {
+        my $self = shift;
+        ....
+      }
+  
+      sub confirm {
+        my $self = shift;
+        ....
+      }
+
+      sub complete {
+        my $self = shift;
+        ...process start(DB insert etc..)
+        $self->clear_csrfid;
+        ....
+      }
+
+  is_post_request
+    Check request method.If request method is POST, 1 is returned.
+
+    Example :
+
+      my $post_flag;
+      if($self->is_post_request){
+         # $self->query->request_method or $ENV{REQUEST_METHOD} is POST
+      }else{
+         # not POST
+      }
+
+CAUTION
+    It has only the protection function of basic CSRF,and mount other
+    security checks in the application, please.
+
+SEE ALSO
+    Carp CGI::Application Exporter Digest::SHA1 HTML::TokeParser List::Util
+
+AUTHOR
+    Akira Horimoto <kurt0027@gmail.com>
+
+COPYRIGHT
+    Copyright (C) 2006 Akira Horimoto
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         CGI-Application-Plugin-ProtectCSRF
+version:      0.01
+version_from: ProtectCSRF.pm
+installdirs:  site
+requires:
+    CGI::Application:              4.04
+    CGI::Application::Plugin::Session: 1.01
+    Digest::SHA1:                  2.07
+    List::Util:                    1.18
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

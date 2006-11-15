@@ -2,7 +2,7 @@ NAME
     CGI::Application::Plugin::ProtectCSRF - Plug-in protected from CSRF
 
 VERSION
-    0.01
+    0.02
 
 SYSNPSIS
       use Your::App;
@@ -16,6 +16,28 @@ DESCRIPTION
     interrupted.
 
 METHOD
+  add_postonly_runmodes
+    Runmodes set to runmodes returns add_postonly_runmodes "Forbidden"
+    excluding POST Request.
+
+    Example :
+
+      sub setup { # or cgiapp_init
+
+         my $self = shift;
+         ....
+         # When requests other than POST come to mode1, mode2, and mode3, Forbidden is 
+         # returned.
+         $self->add_postonly_runmodes(qw(mode1 mode2 mode3));
+      }
+
+  delete_postonly_runmodes
+    To cancel runmode set with add_postonly_runmodes, it executes it.
+
+    Example :
+
+      $self->delete_postonly_runmodes(qw(mode1 mode2 mode3));
+
   clear_csrfid
     Clear csrfid. It is preferable to make it execute after processing ends.
 
@@ -57,7 +79,8 @@ CAUTION
     security checks in the application, please.
 
 SEE ALSO
-    Carp CGI::Application Exporter Digest::SHA1 HTML::TokeParser List::Util
+    Carp CGI::Application CGI::Application::Plugin::Session Exporter
+    Digest::SHA1 HTML::TokeParser List::Util
 
 AUTHOR
     Akira Horimoto <kurt0027@gmail.com>

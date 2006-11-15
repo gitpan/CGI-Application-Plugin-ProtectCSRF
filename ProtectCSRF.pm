@@ -8,7 +8,7 @@ CGI::Application::Plugin::ProtectCSRF - Plug-in protected from CSRF
 
 =head1 VERSION
 
-0.01
+0.02
 
 =head1 SYSNPSIS
 
@@ -40,20 +40,20 @@ our(
     $VERSION
 );
 
-@EXPORT         = qw(clear_csrfid is_post_request);
-$CSRFID         = "_csrfid";
-$FORBIDDEN_CODE = 403;
-$FORBIDDEN_BODY = <<FORBIDDEN;
+@EXPORT                = qw(clear_csrfid is_post_request add_postonly_runmodes delete_postonly_runmodes);
+$CSRFID                = "_csrfid";
+$FORBIDDEN_CODE        = ($ENV{MOD_PERL}) ? 200 : 403;
+$FORBIDDEN_BODY        = <<FORBIDDEN;
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
 <html><head>
-<title>$FORBIDDEN_CODE Forbidden</title>
+<title>Forbidden</title>
 </head><body>
 <h1>Forbidden</h1>
 <p>You don't have permission to access on this server.</p>
 </body></html>
 FORBIDDEN
-$FORBIDDEN_MODE = "_access_403_forbidden";
-$VERSION        = 0.01;
+$FORBIDDEN_MODE        = "_access_403_forbidden";
+$VERSION               = 0.02;
 
 sub import {
 
@@ -73,6 +73,63 @@ sub import {
 =pod
 
 =head1 METHOD
+
+=head2 add_postonly_runmodes
+
+Runmodes set to runmodes returns add_postonly_runmodes "Forbidden" excluding POST Request.
+
+Example : 
+
+  sub setup { # or cgiapp_init
+
+     my $self = shift;
+     ....
+     # When requests other than POST come to mode1, mode2, and mode3, Forbidden is 
+     # returned.
+     $self->add_postonly_runmodes(qw(mode1 mode2 mode3));
+  }
+
+=cut
+
+sub add_postonly_runmodes {
+
+    my($self, @runmodes) = @_;
+    if(ref($self->{__CAP_PROTECT_CSRF_CONFIG}->{POSTONLY_RUNMODES}) ne "HASH"){
+
+        $self->{__CAP_PROTECT_CSRF_CONFIG}->{POSTONLY_RUNMODES} = {};
+    }
+    map { $self->{__CAP_PROTECT_CSRF_CONFIG}->{POSTONLY_RUNMODES}->{$_} = 1 } @runmodes;
+}
+
+=pod
+
+=head2 delete_postonly_runmodes
+
+To cancel runmode set with add_postonly_runmodes, it executes it.
+
+Example : 
+
+  $self->delete_postonly_runmodes(qw(mode1 mode2 mode3));
+
+=cut
+
+sub delete_postonly_runmodes {
+
+    my($self, @runmodes) = @_;
+    if(ref($self->{__CAP_PROTECT_CSRF_CONFIG}->{POSTONLY_RUNMODES}) ne "HASH"){
+
+        $self->{__CAP_PROTECT_CSRF_CONFIG}->{POSTONLY_RUNMODES} = {};
+        return;
+    }
+    
+    map {
+        if(exists $self->{__CAP_PROTECT_CSRF_CONFIG}->{POSTONLY_RUNMODES}->{$_}){
+            delete $self->{__CAP_PROTECT_CSRF_CONFIG}->{POSTONLY_RUNMODES}->{$_};
+        }
+    } @runmodes;
+}
+
+=pod
 
 =head2 clear_csrfid
 
@@ -155,6 +212,7 @@ sub _csrf_forbidden {
 
     my($self, $rm) = @_;
 
+    my $err_flg = 0;
 # request method : POST only
     if($self->is_post_request){
 
@@ -164,18 +222,33 @@ sub _csrf_forbidden {
             $self->query->param($CSRFID) ne $self->session->param($CSRFID)
         ){
 
-            $self->run_modes( $FORBIDDEN_MODE => sub {
-               
-                my $self = shift;
-                $self->header_props(
-                                -type   => "text/html",
-                                -status => $FORBIDDEN_CODE,
-                                );
-                return $FORBIDDEN_BODY;
-            });
-            $self->prerun_mode($FORBIDDEN_MODE);
+            $err_flg = 1;
+        }
+    }else{
+
+# postonly runmode check
+        if(
+           ref($self->{__CAP_PROTECT_CSRF_CONFIG}->{POSTONLY_RUNMODES}) eq "HASH" &&
+           exists $self->{__CAP_PROTECT_CSRF_CONFIG}->{POSTONLY_RUNMODES}->{$rm}
+        ){
+            $err_flg = 1;
         }
     }
+
+    if($err_flg){
+
+        $self->run_modes( $FORBIDDEN_MODE => sub {       
+     
+            my $self = shift;
+            $self->header_props(
+                            -type   => "text/html",
+                            -status => $FORBIDDEN_CODE,
+                            );
+            return $FORBIDDEN_BODY;
+        });
+        $self->prerun_mode($FORBIDDEN_MODE);
+    }
+
     return 0;
 }
 
@@ -230,7 +303,7 @@ It has only the protection function of basic CSRF,and mount other security check
 
 =head1 SEE ALSO
 
-L<Carp> L<CGI::Application> L<Exporter> L<Digest::SHA1> L<HTML::TokeParser> L<List::Util>
+L<Carp> L<CGI::Application> L<CGI::Application::Plugin::Session> L<Exporter> L<Digest::SHA1> L<HTML::TokeParser> L<List::Util>
 
 =head1 AUTHOR
 

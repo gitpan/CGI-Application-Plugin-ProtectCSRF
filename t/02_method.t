@@ -9,6 +9,6 @@ use CGI::Application::Plugin::ProtectCSRF;
 package main;
 
 my $app = TestApp->new;
-can_ok($app, qw(clear_csrfid is_post_request));
+can_ok($app, qw(clear_csrfid is_post_request add_postonly_runmodes delete_postonly_runmodes));
 
 

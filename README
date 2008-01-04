@@ -2,7 +2,7 @@ NAME
     CGI::Application::Plugin::ProtectCSRF - Plug-in protected from CSRF
 
 VERSION
-    1.00
+    1.01
 
 SYNPSIS
       use Your::App;
@@ -36,7 +36,7 @@ ACTION
     ticket is set automatically by hidden field
 
       # publish CSRF ticket
-      sub input_form: PublishCSRFID {
+      sub input_form : PublishCSRFID {
         my $self = shift;
         return <<HTML;
       <form action="foo" method="post">
@@ -65,7 +65,7 @@ ACTION
       sub finish : ProtectCSRF {
         my $self = shift;
         $self->clear_csrf_id; # require! There is not a meaning unless I do it
-        do_something();       # The processing that you want to performÅiDB processing etcÅj
+        do_something();       # The processing that you want to perform (DB processing etc)
       }
 
 METHOD

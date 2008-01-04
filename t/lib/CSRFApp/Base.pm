@@ -18,6 +18,7 @@ sub setup {
     my $self = shift;
     $self->start_mode("index");
     $self->error_mode("error");
+    $self->mode_param("rm");
     $self->run_modes( index => "index", finish => "finish" );
 }
 

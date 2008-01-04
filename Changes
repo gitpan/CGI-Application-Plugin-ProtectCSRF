@@ -1,5 +1,8 @@
 Revision history for Perl extension CGI::Application::Plugin::ProtectCSRF.
 
+1.01  Thu Jan 04 22:32:00 2008
+    - fixed test script
+
 1.00  Thu Jan 04 21:05:00 2008
     - fixed all
 

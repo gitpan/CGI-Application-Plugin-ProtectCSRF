@@ -8,7 +8,7 @@ CGI::Application::Plugin::ProtectCSRF - Plug-in protected from CSRF
 
 =head1 VERSION
 
-1.00
+1.01
 
 =head1 SYNPSIS
 
@@ -73,7 +73,7 @@ $CSRF_ERROR_TMPL        = \qq{<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
 };
 $CSRF_ID                = "_csrf_id";
 $CSRF_POST_ONLY         = 0;
-$VERSION                = 1.00;
+$VERSION                = 1.01;
 
 my(%publish_csrf_id_runmodes, %protect_csrf_runmodes);
 

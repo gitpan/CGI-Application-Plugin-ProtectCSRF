@@ -1,6 +1,6 @@
 ---
 name: CGI-Application-Plugin-ProtectCSRF
-version: 1
+version: 1.01
 author:
   - 'Akira Horimoto <kurt0027@gmail.com>'
 abstract: Plug-in protected from CSRF
